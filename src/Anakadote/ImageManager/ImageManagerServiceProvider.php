@@ -19,7 +19,7 @@ class ImageManagerServiceProvider extends ServiceProvider {
 	public function boot()
 	{		
 		$this->publishes(
-			[__DIR__.'/public' => public_path('vendor/anakadote/image-manager')]
+			[__DIR__.'/assets' => public_path('vendor/anakadote/image-manager')]
 		);
 	}
 
