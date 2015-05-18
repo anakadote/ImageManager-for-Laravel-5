@@ -31,7 +31,7 @@ class ImageManagerServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		
-		$this->app->singleton('Anakadote\ImageManager', function($app)
+		$this->app['laravel-5-image-manager'] = $this->app->share(function($app)
 		{
 			return new ImageManager;
 		});
