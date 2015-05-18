@@ -17,10 +17,10 @@ class ImageManagerServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function boot()
-	{
-		$this->package('anakadote/laravel-5-image-manager');
-		
-		$this->publishes([__DIR__.'/public' => public_path('vendor/anakadote/image-manager')]);
+	{		
+		$this->publishes(
+			[__DIR__.'/public' => public_path('vendor/anakadote/image-manager')]
+		);
 	}
 
 	/**
@@ -31,7 +31,7 @@ class ImageManagerServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		
-		$this->app['laravel-5-image-manager'] = $this->app->share(function($app)
+		$this->app->singleton('Anakadote\ImageManager', function($app)
 		{
 			return new ImageManager;
 		});
