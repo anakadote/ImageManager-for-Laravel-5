@@ -1,0 +1,23 @@
+{
+    "name": "anakadote/laravel-5-image-manager",
+    "description": "Image resizing and cropping package for Laravel 5.",
+    "authors": [
+        {
+            "name": "Taylor Collins",
+            "email": "devnull@tcdihq.com"
+        }
+    ],
+    "keywords": [
+	    "laravel", "images"
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "~5.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Anakadote\\ImageManager\\": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
