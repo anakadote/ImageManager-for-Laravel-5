@@ -1,4 +1,4 @@
-# Image Resizing and Cropping Package for Laravel 5
+# Image Resizing and Cropping Package for Laravel 5.*
 
 This Laravel package provides a convenient way of resizing and cropping images.
 
@@ -12,13 +12,17 @@ Next, update Composer from the Terminal:
 
     composer update
 
-Next, use artisan to move the package assets to the public directory, also from the Terminal:
+Next, add the service provider. Open `config/app.php` and add a new item to the providers array.
+
+    Laravel >= 5.1:
+    Anakadote\ImageManager\ImageManagerServiceProvider::class
+
+    Laravel 5.0:
+    'Anakadote\ImageManager\ImageManagerServiceProvider'
+
+The final step is to use artisan to move the package assets to the public directory, also from the Terminal:
 
     php artisan vendor:publish
-
-The final step is to add the service provider. Open `config/app.php` and add a new item to the providers array.
-
-    'Anakadote\ImageManager\ImageManagerServiceProvider'
 
 
 ## Usage
