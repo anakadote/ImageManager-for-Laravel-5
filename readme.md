@@ -14,13 +14,8 @@ Next, update Composer from the Terminal:
 
 Next, add the service provider. Open `config/app.php` and add a new item to the providers array.
 
-**Laravel >= 5.1:**
-
     Anakadote\ImageManager\ImageManagerServiceProvider::class
 
-**Laravel 5.0:**
-
-    'Anakadote\ImageManager\ImageManagerServiceProvider'
 
 The final step is to use artisan to move the package assets to the public directory, also from the Terminal:
 
@@ -37,7 +32,7 @@ This package is accessible via a Laravel Facade so to use simply call its method
 Resize or crop an image and get the newly generated image's web path.
 
 ```php
-<img src="{{ ImageManager::getImagePath( public_path() . '/img/' . $image->filename, 250, 200, 'crop' ) }}" alt="">
+<img src="{{ ImageManager::getImagePath(public_path() . '/img/' . $image->filename, 250, 200, 'crop') }}" alt="">
 
 ```
 
