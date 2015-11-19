@@ -527,5 +527,3 @@ class ImageManager
         if(isset($this->temp)) imageDestroy($this->temp);
     }
 }
-
-?>
