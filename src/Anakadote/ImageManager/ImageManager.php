@@ -79,7 +79,7 @@ class ImageManager
             } 
             else {
                 $_errors[] = 'GIF images are not supported';
-                $this->errorHandler();
+                return $this->errorHandler();
             }
             break;
             
@@ -90,7 +90,7 @@ class ImageManager
             } 
             else {
                 $_errors[] = 'JPEG images are not supported';
-                $this->errorHandler();
+                return $this->errorHandler();
             }
             break;
             
@@ -101,7 +101,7 @@ class ImageManager
             } 
             else {
                 $_errors[] = 'JPG images are not supported';
-                $this->errorHandler();
+                return $this->errorHandler();
             }
             break;
             
@@ -111,13 +111,13 @@ class ImageManager
             } 
             else {
                 $_errors[] = 'PNG images are not supported';
-                $this->errorHandler();
+                return $this->errorHandler();
             }
             break;
             
         default:
             $_errors[] = $this->image_info['mime'] . ' images are not supported';
-            $this->errorHandler();
+            return $this->errorHandler();
             break;
         }
         
@@ -466,7 +466,7 @@ class ImageManager
         
         default:
             $_errors[] = $this->image_info['mime'] . ' images are not supported';
-            $this->errorHandler();
+            return $this->errorHandler();
             break;
         }
     }
@@ -496,7 +496,7 @@ class ImageManager
         
         default:
             $_errors[] = $this->image_info['mime'] . ' images are not supported';
-            $this->errorHandler();
+            return $this->errorHandler();
             break;
         }
         
