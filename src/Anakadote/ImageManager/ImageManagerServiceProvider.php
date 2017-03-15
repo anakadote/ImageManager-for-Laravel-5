@@ -4,8 +4,8 @@ namespace Anakadote\ImageManager;
 
 use Illuminate\Support\ServiceProvider;
 
-class ImageManagerServiceProvider extends ServiceProvider {
-
+class ImageManagerServiceProvider extends ServiceProvider
+{
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -32,14 +32,13 @@ class ImageManagerServiceProvider extends ServiceProvider {
      */
     public function register()
     {
-        $this->app['laravel-5-image-manager'] = $this->app->share(function($app)
-        {
+        $this->app->singleton(Anakadote\ImageManager\Facades\ImageManager::class, function($app) {
             return new ImageManager;
         });
         
-        // Register Facade
-        $this->app->booting(function()
-        {
+        $this->app['laravel-5-image-manager'] = $this->app->make(Anakadote\ImageManager\Facades\ImageManager::class);
+        
+        $this->app->booting(function() {
             $loader = \Illuminate\Foundation\AliasLoader::getInstance();
             $loader->alias('ImageManager', 'Anakadote\ImageManager\Facades\ImageManager');
         });
@@ -52,7 +51,6 @@ class ImageManagerServiceProvider extends ServiceProvider {
      */
     public function provides()
     {
-        return array();
+        return [];
     }
-
 }
