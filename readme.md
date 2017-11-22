@@ -55,6 +55,23 @@ The getImagePath() method has five parameters, the first four of which are requi
 ***
 
 
+### getUniqueFilename($filename, $destination)
+
+Generate a unique file name within a destination directory — uses the original file name as the basis for the new file name.
+
+```php
+<?php
+
+$unique_filename = ImageManager::getUniqueFilename( $filename, public_path() . '/img/' );
+
+```
+
+The getUniqueFilename() method has two parameters: the original filename, and the destination path.
+
+
+***
+
+
 ### deleteImage($filename)
 
 Delete an image including all resized and/or cropped images generated from it.

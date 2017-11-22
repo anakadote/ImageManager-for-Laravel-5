@@ -2,13 +2,17 @@
 
 namespace Anakadote\ImageManager;
 
+use Exception;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+
 class ImageManager
 {
     protected $file;
     protected $file_path;
     protected $url_path;
     protected $filename;
-    protected $error_filename;
+    protected $error_file;
     protected $image;
     protected $temp;
     protected $mode; // crop, fit, fit-x, fit-y
@@ -26,12 +30,12 @@ class ImageManager
      * @throws Exception
      */
     public function __construct($error_filename = 'error.jpg')
-    {
-        $this->error_filename = $error_filename;
+    {        
+        $this->error_file = public_path() . '/vendor/anakadote/image-manager/' . $error_filename;
         $this->errors = array();
         
-        if(! function_exists('gd_info')){
-            throw new \Exception('GD Library required in package Anakadote\ImageManager.');
+        if (! function_exists('gd_info')) {
+            throw new Exception('GD Library required in package Anakadote\ImageManager.');
         }
         
         ini_set("memory_limit", "512M");
@@ -49,7 +53,7 @@ class ImageManager
      */
     public function getImagePath($file, $width, $height, $mode, $quality = 90)
     {    
-        // Separate file into name and paths        
+        // Separate file into name and paths
         $this->parseFileName($file);
         
         $this->width = $width;
@@ -59,13 +63,13 @@ class ImageManager
         
         
         // Use error image if file cannot be found
-        if( empty($file) || ! file_exists($file) || is_dir($file)){
+        if (empty($file) || ! file_exists($file) || is_dir($file)) {
             return $this->errorHandler();
         }
         
-                    
+        
         // File already there so don't bother creating it
-        if(file_exists($this->getPath(true))) return $this->getPath();
+        if (file_exists($this->getPath(true))) return $this->getPath();
         
         
         // Make sure file type is supported
@@ -74,8 +78,8 @@ class ImageManager
         switch ($this->image_info['mime']) {
             
         case 'image/gif':
-            if(imagetypes() & IMG_GIF) {
-                $this->image = imagecreatefromgif($this->file);
+            if (imagetypes() & IMG_GIF) {
+                $this->image = imagecreatefromgif ($this->file);
             } 
             else {
                 $_errors[] = 'GIF images are not supported';
@@ -84,7 +88,7 @@ class ImageManager
             break;
             
         case 'image/jpeg':
-            if(imagetypes() & IMG_JPG) {
+            if (imagetypes() & IMG_JPG) {
                 $this->adjustImageOrientation();
                 $this->image = imagecreatefromjpeg($this->file);
             } 
@@ -95,7 +99,7 @@ class ImageManager
             break;
             
         case 'image/jpg':
-            if(imagetypes() & IMG_JPG) {
+            if (imagetypes() & IMG_JPG) {
                 $this->adjustImageOrientation();
                 $this->image = imagecreatefromjpeg($this->file);
             } 
@@ -106,7 +110,7 @@ class ImageManager
             break;
             
         case 'image/png':
-            if(imagetypes() & IMG_PNG) {
+            if (imagetypes() & IMG_PNG) {
                 $this->image = imagecreatefrompng($this->file);
             } 
             else {
@@ -149,22 +153,22 @@ class ImageManager
     {
         $foldername = $this->width . "-" . $this->height; // First make dimensions folder
         
-        if(! file_exists($this->file_path . "/" . $foldername)){
-                        
-            if(! mkdir($this->file_path . "/" . $foldername, 0777)){
-                throw new \Exception('Error creating directory');
+        if (! file_exists($this->file_path . "/" . $foldername)) {
+            
+            if (! mkdir($this->file_path . "/" . $foldername, 0777)) {
+                throw new Exception('Error creating directory');
             }
         }
         
         $foldername = $foldername . "/" . $this->mode; // Then make mode folder
-        if(! file_exists($this->file_path . "/" . $foldername)){ 
+        if (! file_exists($this->file_path . "/" . $foldername)) { 
             
-            if(! mkdir($this->file_path . "/" . $foldername, 0777)){
-                throw new \Exception('Error creating directory');
+            if (! mkdir($this->file_path . "/" . $foldername, 0777)) {
+                throw new Exception('Error creating directory');
             }
         }
         
-        if($from_root){
+        if ($from_root) {
             return $this->file_path . "/" . $this->width . "-" . $this->height . "/" . $this->mode;
         
         } else {
@@ -179,11 +183,11 @@ class ImageManager
      */
     public function getErrors()
     {
-        return $this->errors;    
+        return $this->errors;
     }
     
     /**
-     * Separate file name into name and paths    
+     * Separate file name into name and paths
      *
      * @param  string  $file
      */
@@ -208,7 +212,7 @@ class ImageManager
         $orig_height = imagesy($this->image);
         
         // Determine new image dimensions
-        if($this->mode === "crop"){ // Crop image
+        if ($this->mode === "crop") { // Crop image
             
             $max_width = $crop_width = $width;
             $max_height = $crop_height = $height;
@@ -216,11 +220,11 @@ class ImageManager
             $x_ratio = @($max_width / $orig_width);
             $y_ratio = @($max_height / $orig_height);
             
-            if($orig_width > $orig_height){ // Original is wide
+            if ($orig_width > $orig_height) { // Original is wide
                 $height = $max_height;
                 $width = ceil($y_ratio * $orig_width);
                 
-            } elseif($orig_height > $orig_width){ // Original is tall
+            } elseif ($orig_height > $orig_width) { // Original is tall
                 $width = $max_width;
                 $height = ceil($x_ratio * $orig_height);
                 
@@ -231,23 +235,23 @@ class ImageManager
             }
             
             // Adjust if the crop width is less than the requested width to avoid black lines
-            if($width < $crop_width){
+            if ($width < $crop_width) {
                 $width = $max_width;
                 $height = ceil($x_ratio * $orig_height);
             }
             
-        } elseif($this->mode === "fit"){ // Fits the image according to aspect ratio to within max height and width
+        } elseif ($this->mode === "fit") { // Fits the image according to aspect ratio to within max height and width
             $max_width = $width;
             $max_height = $height;
         
             $x_ratio = @($max_width / $orig_width);
             $y_ratio = @($max_height / $orig_height);
             
-            if( ($orig_width <= $max_width) && ($orig_height <= $max_height) ){  // Image is smaller than max height and width so don't resize
+            if ( ($orig_width <= $max_width) && ($orig_height <= $max_height) ) {  // Image is smaller than max height and width so don't resize
                 $tn_width = $orig_width;
                 $tn_height = $orig_height;
             
-            } elseif(($x_ratio * $orig_height) < $max_height){ // Wider rather than taller
+            } elseif (($x_ratio * $orig_height) < $max_height) { // Wider rather than taller
                 $tn_height = ceil($x_ratio * $orig_height);
                 $tn_width = $max_width;
             
@@ -259,23 +263,23 @@ class ImageManager
             $width = $tn_width;
             $height = $tn_height;
             
-        } elseif($this->mode === "fit-x"){ // Sets the width to the max width and the height according to aspect ratio (will stretch if too small)
+        } elseif ($this->mode === "fit-x") { // Sets the width to the max width and the height according to aspect ratio (will stretch if too small)
             $height = @round($orig_height * $width / $orig_width);
             
-            if($orig_height <= $height){ // Don't stretch if smaller
+            if ($orig_height <= $height) { // Don't stretch if smaller
                 $width = $orig_width;
                 $height = $orig_height;
             }
             
-        } elseif($this->mode === "fit-y"){ // Sets the height to the max height and the width according to aspect ratio (will stretch if too small)
+        } elseif ($this->mode === "fit-y") { // Sets the height to the max height and the width according to aspect ratio (will stretch if too small)
             $width = @round($orig_width * $height / $orig_height);
             
-            if($orig_width <= $width){ // Don't stretch if smaller
+            if ($orig_width <= $width) { // Don't stretch if smaller
                 $width = $orig_width;
                 $height = $orig_height;
             }
         } else {
-            throw new \Exception('Invalid mode: ' . $this->mode);
+            throw new Exception('Invalid mode: ' . $this->mode);
         }
         
 
@@ -283,7 +287,7 @@ class ImageManager
         $this->temp = imagecreatetruecolor($width, $height);
         
         // Preserve transparency if a png
-        if($this->image_info['mime'] == 'image/png'){
+        if ($this->image_info['mime'] == 'image/png') {
             imagealphablending($this->temp, false);
             imagesavealpha($this->temp, true);
         }
@@ -293,17 +297,17 @@ class ImageManager
         
         
         // Cropping?
-        if($this->mode === "crop"){     
+        if ($this->mode === "crop") {
             $orig_width  = imagesx($this->image);
             $orig_height = imagesy($this->image);
             
             $x_mid = $orig_width/2;  // horizontal middle
-        $y_mid = $orig_height/2; // vertical middle
+            $y_mid = $orig_height/2; // vertical middle
             
             $this->temp = imagecreatetruecolor($crop_width, $crop_height);
             
             // Preserve transparency if a png
-            if($this->image_info['mime'] == 'image/png'){
+            if ($this->image_info['mime'] == 'image/png') {
                 imagealphablending($this->temp, false);
                 imagesavealpha($this->temp, true);
             }
@@ -320,15 +324,15 @@ class ImageManager
     {        
         $exif = @exif_read_data($this->file);
         
-        if($exif && isset($exif['Orientation'])) {
+        if ($exif && isset($exif['Orientation'])) {
             $orientation = $exif['Orientation'];
             
-            if($orientation != 1){
+            if ($orientation != 1) {
                 $img = imagecreatefromjpeg($this->file);
                 
                 $mirror = false;
                 $deg    = 0;
-                                
+                
                 switch ($orientation) {
                 
                 case 2:
@@ -341,12 +345,12 @@ class ImageManager
                 
                 case 4:
                     $deg = 180;
-                    $mirror = true;  
+                    $mirror = true;
                     break;
                 
                 case 5:
                     $deg = 270;
-                    $mirror = true; 
+                    $mirror = true;
                     break;
                 
                 case 6:
@@ -355,7 +359,7 @@ class ImageManager
                 
                 case 7:
                     $deg = 90;
-                    $mirror = true; 
+                    $mirror = true;
                     break;
                 
                 case 8:
@@ -363,10 +367,10 @@ class ImageManager
                     break;
                 }
                 
-                if($deg)         $img = imagerotate($img, $deg, 0); 
-                if($mirror) $img = $this->mirrorImage($img);
+                if ($deg)    $img = imagerotate($img, $deg, 0);
+                if ($mirror) $img = $this->mirrorImage($img);
                 
-                $this->image = str_replace('.jpg', "-O$orientation.jpg", $this->file); 
+                $this->image = str_replace('.jpg', "-O$orientation.jpg", $this->file);
                 imagejpeg($img, $this->file, $this->quality);
             }
         }
@@ -390,10 +394,32 @@ class ImageManager
         
         $imgdest = imagecreatetruecolor($width, $height);
         
-        if(imagecopyresampled($imgdest, $image, 0, 0, $src_x, $src_y, $width, $height, $src_width, $src_height)){
+        if (imagecopyresampled($imgdest, $image, 0, 0, $src_x, $src_y, $width, $height, $src_width, $src_height)) {
             return $imgdest;
         }
         return $image;
+    }
+    
+    /** 
+     * Generate a unique file name within a given destination
+     *
+     * @param  string  $file
+     * @param  string  $destination
+     * @param  string
+     */
+    public function getUniqueFilename($filename, $destination)
+    {    
+        $filename = $this->slug($filename);
+        
+        if (! file_exists($destination . $filename)) {
+            return $filename;
+        }
+        
+        $parts = explode('.', $filename);
+        $extension = strtolower(array_pop($parts));
+        $filename = $parts[0] .= '-' . uniqid() . '.' . $extension;
+        
+        return $this->getUniqueFilename($filename, $destination);
     }
     
     /** 
@@ -403,14 +429,14 @@ class ImageManager
      */
     public function deleteImage($file)
     {    
-        // Separate file into name and paths        
+        // Separate file into name and paths
         $this->parseFileName($file);
         
-        $dir = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->file_path));
-        foreach($dir as $dir_file){            
+        $dir = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->file_path));
+        foreach ($dir as $dir_file) {
             $parts = explode('/', str_replace($this->file_path, '', $dir_file));
-                        
-            if($this->filename == "/" . $parts[ count($parts)-1 ]){
+            
+            if ($this->filename == "/" . $parts[ count($parts)-1 ]) {
                 unlink($dir_file);
             }
         }
@@ -508,14 +534,37 @@ class ImageManager
      */
     protected function errorHandler()
     {
-        $this->file = public_path() . '/vendor/anakadote/image-manager/' . $this->error_filename;
-                        
-        if(file_exists($this->file)){
+        $this->file = $this->error_file;
+        
+        if (file_exists($this->file)) {
             return $this->getImagePath($this->file, $this->width, $this->height, $this->mode, $this->quality);
         
         } else {
-            $this->errors[] = 'Error image not found.';    
+            $this->errors[] = 'Error image not found.';
         }
+    }
+    
+    /**
+     * Generate a filename "slug".
+     *
+     * @param  string  $filename
+     * @return string
+     */
+    private function slug($filename)
+    {
+        // Replace '_' with the word '-'
+        $filename = preg_replace('![\_]+!u', '-', $filename);
+
+        // Replace @ with the word 'at'
+        $filename = str_replace('@', '-at-', $filename);
+
+        // Remove all characters that are not the separator, letters, numbers, a period, or whitespace.
+        $filename = preg_replace('![^\-\.\pL\pN\s]+!u', '', mb_strtolower($filename));
+
+        // Replace all separator characters and whitespace by a single separator
+        $filename = preg_replace('![\-\s]+!u', '-', $filename);
+
+        return trim($filename, '-');
     }
     
     /** 
@@ -523,7 +572,7 @@ class ImageManager
      */
     public function __destruct()
     {
-        if(isset($this->image)) imageDestroy($this->image);
-        if(isset($this->temp)) imageDestroy($this->temp);
+        if (isset($this->image)) imageDestroy($this->image);
+        if (isset($this->temp)) imageDestroy($this->temp);
     }
 }
