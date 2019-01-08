@@ -19,7 +19,7 @@ Next, add the service provider. Open `config/app.php` and add a new item to the 
 
 The final step is to use artisan to move the package assets to the public directory, also from the Terminal:
 
-    php artisan vendor:publish
+    php artisan vendor:publish --provider="Anakadote\ImageManager\ImageManagerServiceProvider"
 
 
 ## Usage
