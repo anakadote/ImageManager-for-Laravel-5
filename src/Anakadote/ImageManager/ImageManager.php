@@ -170,10 +170,9 @@ class ImageManager
         
         if ($from_root) {
             return $this->file_path . "/" . $this->width . "-" . $this->height . "/" . $this->mode;
-        
-        } else {
-            return $this->url_path . "/" . $this->width . "-" . $this->height . "/" . $this->mode;
         }
+        
+        return $this->url_path . "/" . $this->width . "-" . $this->height . "/" . $this->mode;
     }
     
     /** 
@@ -193,9 +192,9 @@ class ImageManager
      */
     private function parseFileName($file)
     {
-        $this->file      = $file;
+        $this->file      = str_replace('\\', '/', $file);
         $this->file_path = dirname($this->file);
-        $this->url_path  = str_replace(public_path(), "", $this->file_path);
+        $this->url_path  = str_replace(str_replace('\\', '/', public_path()), "", $this->file_path);
         $this->filename  = str_replace($this->file_path, "", $this->file);
     }
     
@@ -397,6 +396,7 @@ class ImageManager
         if (imagecopyresampled($imgdest, $image, 0, 0, $src_x, $src_y, $width, $height, $src_width, $src_height)) {
             return $imgdest;
         }
+        
         return $image;
     }
     
@@ -434,14 +434,12 @@ class ImageManager
         
         $dir = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->file_path));
         foreach ($dir as $dir_file) {
-            $parts = explode('/', str_replace($this->file_path, '', $dir_file));
-            
-            if ($this->filename == "/" . $parts[ count($parts)-1 ]) {
+            if ($this->filename == '/' . basename($dir_file)) {
                 unlink($dir_file);
             }
         }
         
-        @unlink($file);
+        unlink($file);
     }
     
     /** 
@@ -538,10 +536,9 @@ class ImageManager
         
         if (file_exists($this->file)) {
             return $this->getImagePath($this->file, $this->width, $this->height, $this->mode, $this->quality);
-        
-        } else {
-            $this->errors[] = 'Error image not found.';
         }
+        
+        $this->errors[] = 'Error image not found.';
     }
     
     /**
