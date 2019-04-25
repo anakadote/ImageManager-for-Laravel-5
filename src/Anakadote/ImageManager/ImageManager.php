@@ -438,8 +438,6 @@ class ImageManager
                 unlink($dir_file);
             }
         }
-        
-        unlink($file);
     }
     
     /** 
