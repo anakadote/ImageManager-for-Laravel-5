@@ -74,6 +74,10 @@ class ImageManager
         
         // Make sure file type is supported
         $this->image_info = getimagesize($this->file);
+        if (! $this->image_info || ! isset($this->image_info['mime'])) {
+            $_errors[] = 'Invalid file type';
+            return $this->errorHandler();
+        }
         
         switch ($this->image_info['mime']) {
             
