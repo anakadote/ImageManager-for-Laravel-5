@@ -70,6 +70,12 @@ class ImageManager
         
         // File already there so don't bother creating it
         if (file_exists($this->getPath(true))) return $this->getPath();
+
+
+        // SVG? Simply return the URL path to the image
+        if ($this->getExtension($this->filename) === 'svg') {
+            return $this->url_path . $this->filename;
+        }
         
         
         // Make sure file type is supported
@@ -405,6 +411,18 @@ class ImageManager
     }
     
     /** 
+     * Get a file name's extension
+     *
+     * @param  string  $file
+     * @param  string
+     */
+    public function getExtension($filename)
+    {    
+        $parts = explode('.', $filename);
+        return strtolower(array_pop($parts));
+    }
+    
+    /** 
      * Generate a unique file name within a given destination
      *
      * @param  string  $file
@@ -420,8 +438,7 @@ class ImageManager
         }
         
         $parts = explode('.', $filename);
-        $extension = strtolower(array_pop($parts));
-        $filename = $parts[0] .= '-' . uniqid() . '.' . $extension;
+        $filename = $parts[0] .= '-' . uniqid() . '.' . $this->getExtension($filename);
         
         return $this->getUniqueFilename($filename, $destination);
     }
