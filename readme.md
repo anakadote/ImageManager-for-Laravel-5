@@ -1,4 +1,4 @@
-# Image Resizing and Cropping Package for Laravel 5.*
+# Image Resizing and Cropping Package for Laravel
 
 This Laravel package provides a convenient way of resizing and cropping images.
 
@@ -27,16 +27,25 @@ The final step is to use artisan to move the package assets to the public direct
 This package is accessible via a Laravel Facade so to use simply call its methods on the Facade "ImageManager".
 
 
-### getImagePath($filename, $width, $height, $mode, $quality=90)
+### getImagePath($filename, $width, $height, $mode, $quality = 90)
 
-Resize or crop an image and get the newly generated image's web path.
+Example 1: Resize or crop an image and get the newly generated image's web path.
 
 ```php
 <img src="{{ ImageManager::getImagePath(public_path() . '/img/' . $image->filename, 250, 200, 'crop') }}" alt="">
 
 ```
 
-The getImagePath() method has five parameters, the first four of which are required:
+Example 2: Use an HTML picture element to display a webp version of the image, if supported by the browser.
+
+```html
+<picture>
+    <source srcset="{{ ImageManager::getImagePath(public_path() . '/img/' . $image->filename, 250, 200, 'crop', 90, 'webp') }}" type="image/webp">
+    <img src="{{ ImageManager::getImagePath(public_path() . '/img/' . $image->filename, 250, 200, 'crop') }}" alt="">
+</picture>
+```
+
+The getImagePath() method has six parameters, the first four of which are required:
 
 1. File Name *(string)* The fully qualified name of image file. The file must reside in your app's `public` directory. You'll need to grant write access by the web server to the `public` directory and its children.
 
@@ -45,11 +54,12 @@ The getImagePath() method has five parameters, the first four of which are requi
 3. Height *(integer)* Desired height of the image.
 4. Output Mode *(string)* The output mode. Options are:
   1. **crop**
-  2. **fit** - Fit while maintaining aspect ratio
-  3. **fit-x** - Fit to the given width while maintaining aspect ratio
-  4. **fit-y** - Fit to the given height while maintaining aspect ratio
+  2. **fit** - Fit while maintaining aspect ratio.
+  3. **fit-x** - Fit to the given width while maintaining aspect ratio.
+  4. **fit-y** - Fit to the given height while maintaining aspect ratio.
 
-5. Image Quality - *(integer, 0 - 100)* Default value is 90
+5. Image Quality - *(integer, 0 - 100)* Default value is 90.
+6. Format - *(string)* Convert the image to the given format/extension, e.g. "webp";
 
 
 ***
